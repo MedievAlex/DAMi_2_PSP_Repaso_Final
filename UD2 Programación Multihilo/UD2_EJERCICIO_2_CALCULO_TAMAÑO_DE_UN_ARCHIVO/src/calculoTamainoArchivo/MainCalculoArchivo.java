@@ -1,0 +1,86 @@
+package calculoTamainoArchivo;
+
+import java.io.FileInputStream;
+
+import java.io.IOException;
+
+/**
+Hay que calcular el tamaño en bytes de un archivo. Para ello tenemos este método:
+public static void procesarArchivo(String nombreArchivo){
+	 try (FileInputStream fis = new FileInputStream(nombreArchivo)){
+	 	int byteLeido;
+	 	int contador = 0;
+	 	System.out.println(nombreArchivo+" abierto");
+	 	// Lee el archivo byte a byte
+	 	while ((byteLeido = fis.read()) != -1)
+	 		contador++;
+	 	System.out.println("Archivo " + nombreArchivo+ " tiene " + contador + " bytes.");
+	 } catch (IOException e) {
+	 	System.err.println("Error al procesar el archivo: " + e.getMessage());
+	 }
+ }
+Se trata de hacer un programa que use el método anterior (haciendo cambios sobre él) 
+y aprovechando lo aprendido sobre hilos calcule el tamaño de dos ficheros.
+A tener en cuenta:
+    • Desde main() se crearán y lanzarán dos hilos que recibirán nombreArchivo, que 
+    tendrá este formato: "C://Users//bego//Downloads//Nota simple.jpg".
+    • Será main quien muestre el tamaño del archivo, no el hilo.
+**/
+
+public class MainCalculoArchivo {
+
+    public static void main(String[] args) {
+        // Hilos extends Thread
+    	HiloCalculoArchivoExtendsThread hiloExtendsThread = null;
+        // Hilos implements Runnable
+        HiloCalculoArchivoImplementsRunnable hiloImplementsRunnable = null;
+        Thread thread = null;
+
+        //String directory = "C:/Users/" + System.getProperty("user.name") + "/Downloads/";
+        String nombreArchivo = "src/calculoTamainoArchivo/archivo.txt";
+        
+        // Sin hilos, secuencial
+    	procesarArchivo(nombreArchivo);
+    	procesarArchivo(nombreArchivo);
+       
+    	// Con hilos, en paralelo
+        hiloExtendsThread = new HiloCalculoArchivoExtendsThread(nombreArchivo);
+
+        hiloImplementsRunnable = new HiloCalculoArchivoImplementsRunnable(nombreArchivo);
+        thread = new Thread(hiloImplementsRunnable);
+        hiloImplementsRunnable.setThread(thread);
+
+        hiloExtendsThread.start();
+        hiloImplementsRunnable.getThread().start();
+        
+        try {
+        	hiloExtendsThread.join();
+            System.out.println("[HILO Extends Thread] Archivo " + nombreArchivo + " tiene " + hiloExtendsThread.getCantidadArchivo() + " bytes.");
+
+			thread.join();
+            System.out.println("[HILO Implements Runnable] Archivo " + nombreArchivo + " tiene " + hiloImplementsRunnable.getCantidadArchivo() + " bytes.");
+
+		} catch (InterruptedException e) {
+			System.err.println("[MAIN: Error] " + e.getMessage());
+		}
+    }
+
+    public static void procesarArchivo(String nombreArchivo){
+        try (FileInputStream fis = new FileInputStream(nombreArchivo)){
+            int byteLeido = 0;
+            int contador = 0;
+
+            System.out.println("[MAIN] Archivo " + nombreArchivo +" abierto.");
+            // Lee el archivo byte a byte
+            while (byteLeido != -1) {
+            	byteLeido = fis.read();
+            	contador++;
+            }
+            
+            System.out.println("[MAIN] Archivo " + nombreArchivo+ " tiene " + contador + " bytes.");
+            
+        } catch (IOException e) {
+            System.err.println("[MAIN: Error] " + e.getMessage());
+        }
+    }
+}

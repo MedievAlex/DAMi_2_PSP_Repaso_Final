@@ -1,0 +1,22 @@
+2.2-CALCULO TAMAÑO DE UN ARCHIVO
+
+    Hay que calcular el tamaño en bytes de un archivo. Para ello tenemos este método:
+        public static void procesarArchivo(String nombreArchivo)
+        {
+            try (FileInputStream fis = new FileInputStream(nombreArchivo))
+                {
+                    int byteLeido;
+                    int contador = 0;
+                    System.out.println(nombreArchivo+" abierto");
+                    // Lee el archivo byte a byte
+                    while ((byteLeido = fis.read()) != -1)
+                    contador++;
+                    System.out.println("Archivo " + nombreArchivo+ " tiene " + contador + " bytes.");
+            } catch (IOException e) {
+                System.err.println("Error al procesar el archivo: " + e.getMessage());
+            }
+        }
+    Se trata de hacer un programa que use el método anterior (haciendo cambios sobre él) y aprovechando lo aprendido sobre hilos calcule el tamaño de dos ficheros.
+    A tener en cuenta:
+        •	Desde main() se crearán y lanzarán dos hilos que recibirán nombreArchivo, que tendrá este formato: "C://Users//bego//Downloads//Nota simple.jpg".
+        •	Será main quien muestre el tamaño del archivo, no el hilo.
