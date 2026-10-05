@@ -1,0 +1,29 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class SubprocessExample {
+
+    public static void main(String[] args) {
+        try {
+            // Crear un proceso que ejecute el comando "ping" para comprobar la conexión a una dirección
+            ProcessBuilder builder = new ProcessBuilder("ping", "google.com");
+
+            // Iniciar el proceso
+            Process process = builder.start();
+
+            // Capturar la salida del proceso
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            // Esperar a que el proceso termine y obtener el código de salida
+            int exitCode = process.waitFor();
+            System.out.println("Proceso terminado con código de salida: " + exitCode);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
